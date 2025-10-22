@@ -28,23 +28,14 @@
             <div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
                 <div class="carousel-inner rounded shadow-sm">
                     {% for img in prop.images %}
-                        {% set raw_path = img.file_path %}
-                        {% if raw_path.startswith('http') %}
-                            {% set img_url = raw_path %}
-                        {% elif raw_path.startswith('static/') %}
-                            {% set img_url = url_for('static', filename=raw_path.replace('static/', '')) %}
-                        {% elif raw_path.startswith('uploads/') or raw_path.startswith('/uploads/') %}
-                            {% set img_url = url_for('serve_uploads', filename=raw_path.replace('/uploads/', '').replace('uploads/', '')) %}
-                        {% else %}
-                            {% set img_url = url_for('static', filename=raw_path) %}
-                        {% endif %}
-
                         <div class="carousel-item {% if loop.first %}active{% endif %}">
-                            <img src="{{ img_url }}" 
+                            {# --- vvv [แก้ไข] ใช้ img.file_path โดยตรง vvv --- #}
+                            <img src="{{ img.file_path }}" 
                                  class="d-block w-100 property-img"
                                  alt="{{ prop.dorm_name }}"
                                  style="height: 450px; object-fit: cover; cursor: zoom-in;"
-                                 data-src="{{ img_url }}">
+                                 data-src="{{ img.file_path }}">
+                            {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
                         </div>
                     {% else %}
                         <div class="carousel-item active">
@@ -212,7 +203,7 @@
                     <div id="map" style="height: 250px; width: 100%;" class="border rounded mb-3"></div>
 
                     {% if prop.location_pin and prop.location_pin.coordinates %}
-                        <a href="http://googleusercontent.com/maps/google.com/0{{ prop.location_pin.coordinates[1] }},{{ prop.location_pin.coordinates[0] }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ prop.location_pin.coordinates[1] }},{{ prop.location_pin.coordinates[0] }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
                             เปิดใน Google Maps
                         </a>
                     {% else %}
