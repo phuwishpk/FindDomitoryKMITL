@@ -21,13 +21,14 @@ class Config:
     BABEL_DEFAULT_LOCALE = "th"
     BABEL_DEFAULT_TIMEZONE = "Asia/Bangkok"
 
-    # --- vvv แก้ไขการตั้งค่าอีเมลสำหรับทดสอบ vvv ---
-    # ใช้เซิร์ฟเวอร์จำลองที่รันบนเครื่องของเรา
     MAIL_SERVER = 'localhost'
-    MAIL_PORT = 8025  # พอร์ตเดียวกับที่รันในขั้นตอนที่ 1
+    MAIL_PORT = 8025
     MAIL_USE_TLS = False
-    # ไม่ต้องใช้ Username/Password สำหรับเซิร์ฟเวอร์จำลอง
     MAIL_USERNAME = None
     MAIL_PASSWORD = None
     MAIL_DEFAULT_SENDER = ('FindDorm KMITL', 'noreply@finddorm-kmitl.com')
-    # --- ^^^ สิ้นสุดการแก้ไข ^^^ ---
+
+    # --- vvv เพิ่ม 3 บรรทัดนี้เข้าไป vvv ---
+    CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")

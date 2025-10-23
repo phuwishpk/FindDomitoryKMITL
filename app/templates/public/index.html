@@ -133,7 +133,7 @@
   /* --- CSS สำหรับปุ่ม Slider --- */
   .slider-wrapper {
     position: relative;
-    padding: 0 40px; 
+    padding: 0 40px;
   }
 
   .slider-controls button {
@@ -165,9 +165,9 @@
       transform: translateY(-50%) scale(1);
   }
 
-  .slider-controls button[data-controls="prev"] { left: 0px; } 
+  .slider-controls button[data-controls="prev"] { left: 0px; }
   .slider-controls button[data-controls="next"] { right: 0px; }
- 
+
   @media (max-width: 1200px) {
     .slider-controls button[data-controls="prev"] { left: 0; }
     .slider-controls button[data-controls="next"] { right: 0; }
@@ -235,7 +235,9 @@
                     {% set first_image = prop.images|sort(attribute='position')|first %}
                     <a href="{{ url_for('public.property_detail', prop_id=prop.id) }}">
                         {% if first_image %}
-                        <img src="/{{ first_image.file_path }}" class="card-img-top" alt="{{ prop.dorm_name }}" style="height: 180px; object-fit: cover;">
+                        {# --- vvv [แก้ไข] ลบ / ออก vvv --- #}
+                        <img src="{{ first_image.file_path }}" class="card-img-top" alt="{{ prop.dorm_name }}" style="height: 180px; object-fit: cover;">
+                        {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
                         {% else %}
                         <div class="d-flex justify-content-center align-items-center bg-light text-muted" style="height: 180px;">
                             <i data-feather="image" style="width: 48px; height: 48px;"></i>
@@ -264,7 +266,7 @@
             </div>
             {% endfor %}
         </div>
-       
+
         <div class="slider-controls">
             <button data-controls="prev" aria-label="Previous"><i data-feather="chevron-left"></i></button>
             <button data-controls="next" aria-label="Next"><i data-feather="chevron-right"></i></button>
@@ -327,7 +329,7 @@
                 }
             });
         }
-    }, 100); 
+    }, 100);
   });
 </script>
 {% endblock %}

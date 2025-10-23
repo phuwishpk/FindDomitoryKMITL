@@ -3,7 +3,7 @@
 {% block admin_content %}
 <div class="container-fluid my-2">
     <a href="{{ url_for('admin.properties') }}" class="btn btn-sm btn-outline-secondary mb-3">← กลับสู่หน้าข้อมูลหอพัก</a>
-    
+
     {% if not prop %}
     <div class="alert alert-danger">ไม่พบข้อมูลหอพักนี้</div>
     {% else %}
@@ -27,7 +27,9 @@
                 <div class="carousel-inner rounded shadow-sm">
                     {% for img in prop.images %}
                     <div class="carousel-item {% if loop.first %}active{% endif %}">
-                        <img src="/{{ img.file_path }}" class="d-block w-100" alt="{{ prop.dorm_name }}" style="height: 450px; object-fit: cover;">
+                        {# --- vvv [แก้ไข] ลบ / ออก vvv --- #}
+                        <img src="{{ img.file_path }}" class="d-block w-100" alt="{{ prop.dorm_name }}" style="height: 450px; object-fit: cover;">
+                        {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
                     </div>
                     {% else %}
                     <div class="carousel-item active">
@@ -124,7 +126,7 @@
     {% if prop and prop.location_pin and prop.location_pin.coordinates %}
     const lng = {{ prop.location_pin.coordinates[0] }};
     const lat = {{ prop.location_pin.coordinates[1] }};
-    const map = L.map('map').setView([lat, lng], 16); 
+    const map = L.map('map').setView([lat, lng], 16);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
     L.marker([lat, lng]).addTo(map).bindPopup('<b>{{ prop.dorm_name }}</b>').openPopup();
     {% else %}

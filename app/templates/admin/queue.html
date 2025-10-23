@@ -34,14 +34,16 @@
     {% set first_image = p.images|sort(attribute='position')|first %}
       <a href="{{ url_for('admin.review_property', prop_id=p.id) }}">
         {% if first_image %}
-          <img src="/{{ first_image.file_path }}" class="card-img-top" alt="{{ p.dorm_name }}" style="height: 200px; object-fit: cover;">
+          {# --- vvv [แก้ไข] ลบ / ออก vvv --- #}
+          <img src="{{ first_image.file_path }}" class="card-img-top" alt="{{ p.dorm_name }}" style="height: 200px; object-fit: cover;">
+          {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
         {% else %}
           <div class="d-flex justify-content-center align-items-center bg-light text-muted" style="height: 200px;">
               <i data-feather="image" class="text-muted" style="width: 48px; height: 48px;"></i>
           </div>
         {% endif %}
       </a>
-      
+
       <div class="card-body d-flex flex-column">
         <h5 class="card-title text-truncate fw-semibold">{{ p.dorm_name }}</h5>
         <p class="card-text small text-muted mb-3">
