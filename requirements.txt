@@ -40,3 +40,6 @@ MarkupSafe==2.1.5
 python-dotenv==1.0.1
 
 psycopg2-binary==2.9.9
+
+# --- vvv เพิ่มบรรทัดนี้ vvv ---
+cloudinary==1.40.0

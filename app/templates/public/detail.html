@@ -28,23 +28,14 @@
             <div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
                 <div class="carousel-inner rounded shadow-sm">
                     {% for img in prop.images %}
-                        {% set raw_path = img.file_path %}
-                        {% if raw_path.startswith('http') %}
-                            {% set img_url = raw_path %}
-                        {% elif raw_path.startswith('static/') %}
-                            {% set img_url = url_for('static', filename=raw_path.replace('static/', '')) %}
-                        {% elif raw_path.startswith('uploads/') or raw_path.startswith('/uploads/') %}
-                            {% set img_url = url_for('serve_uploads', filename=raw_path.replace('/uploads/', '').replace('uploads/', '')) %}
-                        {% else %}
-                            {% set img_url = url_for('static', filename=raw_path) %}
-                        {% endif %}
-
                         <div class="carousel-item {% if loop.first %}active{% endif %}">
-                            <img src="{{ img_url }}" 
+                            {# --- vvv [แก้ไข] ใช้ img.file_path โดยตรง vvv --- #}
+                            <img src="{{ img.file_path }}" 
                                  class="d-block w-100 property-img"
                                  alt="{{ prop.dorm_name }}"
                                  style="height: 450px; object-fit: cover; cursor: zoom-in;"
-                                 data-src="{{ img_url }}">
+                                 data-src="{{ img.file_path }}">
+                            {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
                         </div>
                     {% else %}
                         <div class="carousel-item active">
@@ -120,7 +111,21 @@
                                 {% endfor %}
                             </div>
                             <p class="mb-1">{{ review.comment }}</p>
-                            <small class="text-muted">เมื่อ {{ review.created_at|to_bkk_time }}</small>
+                            <small class="text-muted">
+                                โดย: 
+                                {% if review.user_id %}
+                                    <span class="fw-semibold">
+                                        {% if review.user_id == prop.owner_id %}
+                                            เจ้าของหอพัก
+                                        {% else %}
+                                            ผู้ใช้ที่ลงทะเบียน #{{ review.user_id }}
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="fw-semibold">{{ review.author_name or 'ผู้เข้าชม (Anonymous)' }}</span>
+                                {% endif %}
+                                · เมื่อ {{ review.created_at|to_bkk_time }}
+                                </small>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -132,6 +137,12 @@
                     <form method="POST" action="{{ url_for('public.property_add_review', prop_id=prop.id) }}" id="review-form">
                         {{ form.hidden_tag() }}
 
+                        {% if not current_user.is_authenticated %}
+                        <div class="mb-3">
+                            <p class="form-label mb-0">คุณจะแสดงความคิดเห็นในชื่อ:</p>
+                            <p class="fw-semibold text-primary">{{ anonymous_name }}</p>
+                        </div>
+                        {% endif %}
                         <div class="mb-3">
                             <label class="form-label">ให้คะแนนหอพัก</label>
                             <div class="star-rating mb-2">
@@ -192,7 +203,7 @@
                     <div id="map" style="height: 250px; width: 100%;" class="border rounded mb-3"></div>
 
                     {% if prop.location_pin and prop.location_pin.coordinates %}
-                        <a href="http://googleusercontent.com/maps/google.com/0{{ prop.location_pin.coordinates[1] }},{{ prop.location_pin.coordinates[0] }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ prop.location_pin.coordinates[1] }},{{ prop.location_pin.coordinates[0] }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
                             เปิดใน Google Maps
                         </a>
                     {% else %}
@@ -309,6 +320,16 @@ if (cancelReviewBtn) {
         if (commentTextarea) {
             commentTextarea.value = '';
         }
+
+        // Remove validation errors if any
+        const form = document.getElementById('review-form');
+        if (form) {
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            // Remove text from custom error display 
+            form.querySelectorAll('.invalid-feedback.d-block').forEach(el => el.innerHTML = '');
+            form.querySelectorAll('.text-danger.small').forEach(el => el.innerHTML = '');
+        }
+
     });
 }
 </script>

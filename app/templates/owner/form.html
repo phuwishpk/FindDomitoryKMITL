@@ -78,7 +78,7 @@
       <div class="row g-3 mb-3">
         <div class="col-md-6"><label class="form-label">เงินประกัน (บาท)</label>{{ form.deposit_amount(class_='form-control' + (' is-invalid' if form.deposit_amount.errors else ''), placeholder='เงินประกัน') }}</div>
       </div>
-      
+
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">เบอร์โทรติดต่อ</label>
@@ -186,7 +186,7 @@
         <div id="image-management-section">
             <h2 class="h5">จัดการรูปภาพ</h2>
             <p class="text-muted small">คุณสามารถอัปโหลด, ลบ, และจัดเรียงลำดับรูปภาพได้ที่นี่ (สูงสุด {{ PropertyPolicy.MAX_IMAGES }} รูป)</p>
-            
+
             <h6 class="mt-4">อัปโหลดรูปภาพใหม่</h6>
             <form class="mb-3" method="post" action="{{ url_for('owner.upload_image', prop_id=prop.id) }}" enctype="multipart/form-data">
                 {{ upload_form.csrf_token }}
@@ -202,7 +202,9 @@
                 {% for img in prop.images|sort(attribute='position') %}
                 <div class="col image-card-col" draggable="true" data-image-id="{{ img.id }}">
                   <div class="card">
-                    <img src="/{{ img.file_path }}" class="card-img-top" alt="#{{ img.id }}">
+                    {# --- vvv [แก้ไข] ลบ / ออก vvv --- #}
+                    <img src="{{ img.file_path }}" class="card-img-top" alt="#{{ img.id }}">
+                    {# --- ^^^ สิ้นสุดการแก้ไข ^^^ --- #}
                     <div class="card-body p-2 d-flex justify-content-between align-items-center">
                       <span class="badge text-bg-light">ลำดับ {{ loop.index }}</span>
                       <button type="button" class="btn btn-sm btn-outline-danger delete-image-btn" data-image-id="{{ img.id }}">ลบ</button>

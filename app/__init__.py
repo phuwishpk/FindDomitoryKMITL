@@ -1,8 +1,9 @@
 from flask import Flask, send_from_directory
 from .extensions import db, migrate, login_manager, babel_ext, limiter, csrf
 from .config import Config
+import cloudinary  # <-- เพิ่ม import
 
-from .utils.helpers import format_as_bangkok_time, from_json_string
+from .utils.helpers import format_as_bangkok_time, from_json_string, get_anonymous_name
 from .forms.upload import EmptyForm
 from .forms.owner import ROOM_TYPE_CHOICES
 
@@ -49,14 +50,12 @@ def register_dependencies(app: Flask):
         report_repo=container["review_report_repo"],
         prop_repo=container["property_repo"]
     )
-    # --- vvv แก้ไขที่นี่ vvv ---
     container["dashboard_service"] = DashboardService(
         user_repo=container["user_repo"],
         property_repo=container["property_repo"],
         approval_repo=container["approval_repo"],
-        review_report_repo=container["review_report_repo"] # เพิ่ม argument ที่ขาดไป
+        review_report_repo=container["review_report_repo"] 
     )
-    # --- ^^^ สิ้นสุดการแก้ไข ^^^ ---
     container["history_service"] = HistoryService(container["property_repo"])
     
     if not hasattr(app, "extensions"):
@@ -66,6 +65,15 @@ def register_dependencies(app: Flask):
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(Config)
+
+    # --- vvv เพิ่มส่วนนี้เข้าไป vvv ---
+    cloudinary.config(
+        cloud_name=app.config.get("CLOUDINARY_CLOUD_NAME"),
+        api_key=app.config.get("CLOUDINARY_API_KEY"),
+        api_secret=app.config.get("CLOUDINARY_API_SECRET"),
+        secure=True
+    )
+    # --- ^^^ สิ้นสุดส่วนที่เพิ่ม ^^^ ---
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -89,7 +97,8 @@ def create_app() -> Flask:
         return dict(
             empty_form=EmptyForm(),
             ROOM_TYPES=room_type_map,
-            recently_viewed_properties=recently_viewed
+            recently_viewed_properties=recently_viewed,
+            anonymous_name=get_anonymous_name() 
         )
 
     with app.app_context():
@@ -101,13 +110,15 @@ def create_app() -> Flask:
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(api_bp, url_prefix="/api")
 
-    @app.route('/uploads/<path:filename>')
-    def serve_uploads(filename):
-        return send_from_directory(
-            app.config['UPLOAD_FOLDER'],
-            filename,
-            as_attachment=False
-        )
+    # --- vvv ลบ route นี้ออกไป vvv ---
+    # @app.route('/uploads/<path:filename>')
+    # def serve_uploads(filename):
+    #     return send_from_directory(
+    #         app.config['UPLOAD_FOLDER'],
+    #         filename,
+    #         as_attachment=False
+    #     )
+    # --- ^^^ สิ้นสุดส่วนที่ลบ ^^^ ---
 
     @app.get("/health")
     def health():

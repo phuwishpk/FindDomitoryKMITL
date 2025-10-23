@@ -1,42 +1,66 @@
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import cloudinary
+import cloudinary.uploader
 
 class UploadService:
     def __init__(self, root_dir: str):
+        # root_dir ไม่ได้ใช้แล้ว แต่คงโครงสร้างเดิมไว้
         self.root = root_dir
 
     def save_image(self, owner_id: int, file_storage) -> str:
         """
-        ตรวจชนิด/ขนาดไฟล์รูป, ตั้งชื่อไฟล์ปลอดภัย, บันทึกลง uploads/<owner_id>/images/, และคืนค่า relative path
+        อัปโหลดไฟล์รูปภาพไปยัง Cloudinary และคืนค่าเป็น secure URL
         """
-        owner_dir_for_saving = os.path.join(self.root, str(owner_id), "images")
-        os.makedirs(owner_dir_for_saving, exist_ok=True)
-        
-        filename = secure_filename(file_storage.filename or "image")
-        full_save_path = os.path.join(owner_dir_for_saving, filename)
-        file_storage.save(full_save_path)
-        
-        relative_path_for_url = os.path.join("uploads", str(owner_id), "images", filename)
-        
-        return relative_path_for_url.replace("\\", "/")
+        if not file_storage or not file_storage.filename:
+            raise ValueError("File storage is invalid")
 
-    # --- vvv ส่วนที่เพิ่มเข้ามาใหม่ vvv ---
+        filename = secure_filename(file_storage.filename)
+        
+        # สร้าง folder path บน Cloudinary เพื่อจัดระเบียบไฟล์
+        folder_path = f"finddorm/owner_{owner_id}/images"
+
+        try:
+            # อัปโหลดไฟล์ไปยัง Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                file_storage,
+                folder=folder_path,
+                # สร้างชื่อไฟล์ที่ไม่ซ้ำกันโดยใช้ timestamp
+                public_id=f"{int(datetime.utcnow().timestamp())}_{os.path.splitext(filename)[0]}"
+            )
+            # ดึง URL ของไฟล์ที่อัปโหลดเสร็จแล้ว
+            secure_url = upload_result.get('secure_url')
+            if not secure_url:
+                raise ValueError("Cloudinary did not return a secure URL.")
+            return secure_url
+        except Exception as e:
+            # หากเกิดข้อผิดพลาด ให้แสดง log และส่ง error ออกไป
+            print(f"Error uploading image to Cloudinary: {e}")
+            raise IOError("Failed to upload image to cloud storage.") from e
+
     def save_document(self, owner_id: int, file_storage) -> str:
         """
-        บันทึกเอกสาร (PDF), สร้างชื่อไฟล์ที่ปลอดภัย, เก็บไว้ใน uploads/<owner_id>/documents/,
-        และคืนค่า relative path สำหรับเก็บลงฐานข้อมูล
+        อัปโหลดไฟล์เอกสาร (PDF) ไปยัง Cloudinary และคืนค่าเป็น secure URL
         """
-        owner_dir_for_saving = os.path.join(self.root, str(owner_id), "documents")
-        os.makedirs(owner_dir_for_saving, exist_ok=True)
-        
-        filename = secure_filename(file_storage.filename or "document.pdf")
-        # เพิ่ม timestamp เพื่อป้องกันชื่อไฟล์ซ้ำ
-        unique_filename = f"{int(datetime.utcnow().timestamp())}_{filename}"
-        full_save_path = os.path.join(owner_dir_for_saving, unique_filename)
-        file_storage.save(full_save_path)
-        
-        relative_path_for_url = os.path.join("uploads", str(owner_id), "documents", unique_filename)
-        
-        return relative_path_for_url.replace("\\", "/")
-    # --- ^^^ สิ้นสุดส่วนที่เพิ่ม ^^^ ---
+        if not file_storage or not file_storage.filename:
+            raise ValueError("File storage is invalid")
+            
+        filename = secure_filename(file_storage.filename)
+        folder_path = f"finddorm/owner_{owner_id}/documents"
+
+        try:
+            # อัปโหลดไฟล์ไปยัง Cloudinary (ระบุ resource_type="raw" สำหรับไฟล์ที่ไม่ใช่รูปภาพ)
+            upload_result = cloudinary.uploader.upload(
+                file_storage,
+                folder=folder_path,
+                public_id=f"{int(datetime.utcnow().timestamp())}_{os.path.splitext(filename)[0]}",
+                resource_type="raw"
+            )
+            secure_url = upload_result.get('secure_url')
+            if not secure_url:
+                raise ValueError("Cloudinary did not return a secure URL for the document.")
+            return secure_url
+        except Exception as e:
+            print(f"Error uploading document to Cloudinary: {e}")
+            raise IOError("Failed to upload document to cloud storage.") from e
