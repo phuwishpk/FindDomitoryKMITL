@@ -1,3 +1,5 @@
+# tests/test_core_workflow.py
+
 import pytest
 from werkzeug.security import generate_password_hash
 from app.core.extensions import db
@@ -116,7 +118,11 @@ def test_full_approval_workflow(client, admin_client):
         'username': 'new_owner@reg.com',
         'password': 'password123'
     }, follow_redirects=True)
-    assert "กลับสู่หน้าหลักเจ้าของหอพัก".encode('utf-8') in login_response.data
+    
+    # --- vvv [แก้ไขบรรทัดนี้] vvv ---
+    # ตรวจสอบข้อความ "ภาพรวมหอพัก" ที่อยู่ในหน้า dashboard
+    assert "ภาพรวมหอพัก".encode('utf-8') in login_response.data
+    # --- ^^^ [สิ้นสุดการแก้ไข] ^^^ ---
     
     # Owner สร้างหอพัก
     create_response = client.post('/owner/property/new', data={
