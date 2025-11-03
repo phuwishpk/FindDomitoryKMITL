@@ -1,3 +1,4 @@
+# app/blueprints/public/__init__.py
 from flask import Blueprint
 bp = Blueprint("public", __name__)
-from . import routes  # noqa: E402,F401
+from . import routes  # <-- เพิ่มบรรทัดนี้
