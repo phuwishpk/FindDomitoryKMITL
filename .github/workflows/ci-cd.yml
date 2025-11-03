@@ -4,9 +4,9 @@ name: 'Build and Test'
 
 on:
   push:
-    branches: [ "project-improvement" , "main" , "develop-project" , "develop-admin" ]
+    branches: [ "develop-project" , "develop-admin" , "Restructure-The-Project" ]
   pull_request:
-    branches: [ "project-improvement" , "main" , "develop-project" , "develop-admin" ]
+    branches: [ "develop-project" , "develop-admin" , "Restructure-The-Project" ]
 
 jobs:
   # Job 1: ตรวจสอบคุณภาพโค้ดด้วย Linterr
