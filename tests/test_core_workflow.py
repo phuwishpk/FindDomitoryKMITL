@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash
 from app.core.extensions import db
 from app.models.user import Owner, Admin
 from app.models.property import Property
-import io  # <-- [เพิ่ม] Import io สำหรับสร้างไฟล์ปลอม
+import io
+from unittest.mock import MagicMock  # <-- [เพิ่ม] 1. Import MagicMock
 
 # --- Fixtures (ตัวช่วย) ---
 
@@ -22,7 +23,6 @@ def admin_client(client):
     # ล็อกอิน
     client.post('/auth/login', data={'username': 'test_admin', 'password': admin_pass})
     yield client
-    # (หลัง Test จบ client จะถูกล้างค่าโดย conftest.py)
 
 @pytest.fixture
 def approved_owner_client(client):
@@ -33,11 +33,11 @@ def approved_owner_client(client):
     owner_pass = "owner_password"
     owner = Owner(
         full_name_th="Test Owner",
-        citizen_id="1111111111111", # (Test DB ไม่เช็คความถูกต้อง)
+        citizen_id="1111111111111", 
         email=owner_email,
         password_hash=generate_password_hash(owner_pass),
         is_active=True,
-        approval_status='approved' # <-- อนุมัติแล้ว
+        approval_status='approved'
     )
     db.session.add(owner)
     db.session.commit()
@@ -55,7 +55,7 @@ def test_public_user_can_see_approved_property(client):
     """
     # GIVEN: สร้างหอพักที่อนุมัติแล้ว 1 แห่ง
     prop = Property(
-        owner_id=1, # (ไม่สำคัญใน Test นี้)
+        owner_id=1, 
         dorm_name="หอพัก A (อนุมัติแล้ว)",
         room_type="studio",
         workflow_status=Property.WORKFLOW_APPROVED
@@ -78,7 +78,8 @@ def test_public_user_can_see_approved_property(client):
     assert "หอพัก A (อนุมัติแล้ว)".encode('utf-8') in response.data
     assert "หอพัก B (แบบร่าง)".encode('utf-8') not in response.data
 
-def test_full_approval_workflow(client, admin_client):
+# --- vvv [เพิ่ม monkeypatch ตรงนี้] vvv ---
+def test_full_approval_workflow(client, admin_client, monkeypatch):
     """
     [แกนหลักที่ 2: Auth + Property + Approval]
     ทดสอบกระบวนการทั้งหมด: 
@@ -90,6 +91,12 @@ def test_full_approval_workflow(client, admin_client):
     6. User ทั่วไป ต้องเห็นหอพักนี้
     """
     
+    # --- vvv [เพิ่ม 2 บรรทัดนี้] vvv ---
+    # 0. สร้าง "ตัวปลอม" ของ Cloudinary Upload
+    mock_upload = MagicMock(return_value={"secure_url": "https://fake-url.com/test.jpg"})
+    monkeypatch.setattr("cloudinary.uploader.upload", mock_upload)
+    # --- ^^^ [สิ้นสุดการเพิ่ม] ^^^ ---
+
     # 1. Owner สมัคร
     response = client.post('/auth/owner/register', data={
         'full_name_th': 'เจ้าของใหม่',
@@ -99,22 +106,20 @@ def test_full_approval_workflow(client, admin_client):
         'citizen_id': '1234567890121'
     }, follow_redirects=True)
     
-    assert response.status_code == 200 # (Redirect ไปหน้า Login)
+    assert response.status_code == 200 
     
-    # ตรวจสอบใน DB
     new_owner = Owner.query.filter_by(email='new_owner@reg.com').first()
     assert new_owner is not None
     assert new_owner.approval_status == 'pending'
 
-    # 2. Admin อนุมัติ Owner (ใช้ admin_client ที่ล็อกอินไว้แล้ว)
+    # 2. Admin อนุมัติ Owner 
     admin_response = admin_client.post(f'/admin/owners/{new_owner.id}/approve', follow_redirects=True)
     assert admin_response.status_code == 200
-    db.session.refresh(new_owner) # ดึงข้อมูลใหม่จาก DB
+    db.session.refresh(new_owner) 
     assert new_owner.approval_status == 'approved'
     assert new_owner.is_active is True
 
     # 3. Owner ล็อกอิน และ สร้างหอพัก
-    # (ใช้ client ธรรมดา แต่เราจะล็อกอินเป็น new_owner)
     login_response = client.post('/auth/login', data={
         'username': 'new_owner@reg.com',
         'password': 'password123'
@@ -122,12 +127,9 @@ def test_full_approval_workflow(client, admin_client):
     
     assert "ภาพรวมหอพัก".encode('utf-8') in login_response.data
     
-    # --- vvv [START แก้ไขส่วนนี้] vvv ---
-    
-    # สร้างไฟล์รูปภาพปลอมในหน่วยความจำ
     dummy_image = (io.BytesIO(b"this-is-a-dummy-image-data"), "test.jpg")
 
-    # Owner สร้างหอพัก (เพิ่ม 'images' และ 'content_type' เข้าไป)
+    # Owner สร้างหอพัก 
     create_response = client.post('/owner/property/new', data={
         'dorm_name': 'หอพักของฉัน',
         'road': 'ลาดกระบัง',
@@ -140,14 +142,12 @@ def test_full_approval_workflow(client, admin_client):
         'deposit_amount': 10000,
         'location_pin_json': '{"type": "Point", "coordinates": [100.77, 13.72]}',
         'amenities': 'wifi',
-        'images': dummy_image  # <-- เพิ่มไฟล์ปลอม
-    }, follow_redirects=True, content_type='multipart/form-data') # <-- ระบุ content_type
-    
-    # --- ^^^ [END แก้ไขส่วนนี้] ^^^ ---
+        'images': dummy_image  
+    }, follow_redirects=True, content_type='multipart/form-data') 
     
     assert create_response.status_code == 200
     new_prop = Property.query.filter_by(dorm_name='หอพักของฉัน').first()
-    assert new_prop is not None  # <-- บรรทัดนี้ควรจะผ่านแล้ว
+    assert new_prop is not None  
     assert new_prop.workflow_status == 'draft'
 
     # 4. Owner ส่งหอพักให้อนุมัติ
@@ -163,7 +163,6 @@ def test_full_approval_workflow(client, admin_client):
     assert new_prop.workflow_status == 'approved'
 
     # 6. User ทั่วไป ต้องเห็นหอพักนี้
-    # (ใช้ client ธรรมดาที่ไม่ได้ล็อกอิน)
     public_response = client.get('/search')
     assert public_response.status_code == 200
     assert "หอพักของฉัน".encode('utf-8') in public_response.data
