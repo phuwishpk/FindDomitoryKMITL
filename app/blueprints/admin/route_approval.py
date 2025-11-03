@@ -1,3 +1,5 @@
+# app/blueprints/admin/route_approval.py
+
 from flask import render_template, redirect, url_for, flash, current_app, request
 from flask_login import login_required, current_user
 from . import bp
@@ -35,9 +37,13 @@ def review_property(prop_id: int):
 @login_required
 @admin_required
 def approve(prop_id: int):
-    if not EmptyForm(request.form).validate_on_submit():
+    # --- vvv [แก้ไขบรรทัดนี้] vvv ---
+    # เปลี่ยนจาก EmptyForm(request.form) เป็น EmptyForm()
+    if not EmptyForm().validate_on_submit():
+    # --- ^^^ [สิ้นสุดการแก้ไข] ^^^ ---
         flash("CSRF Token is invalid.", "danger")
         return redirect(url_for("admin.queue"))
+        
     approval_service = current_app.extensions["container"]["approval_service"]
     try:
         approval_service.approve_property(admin_id=current_user.ref_id, prop_id=prop_id, note=None)
@@ -83,7 +89,7 @@ def review_owner(owner_id: int):
 @login_required
 @admin_required
 def approve_owner(owner_id: int):
-    if not EmptyForm().validate_on_submit():
+    if not EmptyForm().validate_on_submit(): # <--- นี่คือรูปแบบที่ถูกต้อง
         flash("Invalid CSRF token.", "danger")
         return redirect(url_for("admin.owner_queue"))
 
@@ -103,7 +109,7 @@ def approve_owner(owner_id: int):
 @login_required
 @admin_required
 def reject_owner(owner_id: int):
-    if not EmptyForm().validate_on_submit():
+    if not EmptyForm().validate_on_submit(): # <--- นี่คือรูปแบบที่ถูกต้อง
         flash("Invalid CSRF token.", "danger")
         return redirect(url_for("admin.owner_queue"))
 
