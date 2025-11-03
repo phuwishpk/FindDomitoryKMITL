@@ -55,4 +55,8 @@ jobs:
           pip install pytest
 
       - name: '🔬 Run Pytest'
+        env:
+          CLOUDINARY_CLOUD_NAME: 'dummy'
+          CLOUDINARY_API_KEY: 'dummy'
+          CLOUDINARY_API_SECRET: 'dummy'
         run: pytest
