@@ -8,6 +8,7 @@ from app.forms.upload import UploadImageForm, ReorderImagesForm, EmptyForm
 from app.models.property import Property, PropertyImage, Amenity
 from app.models.approval import ApprovalRequest
 from datetime import datetime
+from app.core.extensions import db
 from app.models.approval import AuditLog
 
 # Policy import
