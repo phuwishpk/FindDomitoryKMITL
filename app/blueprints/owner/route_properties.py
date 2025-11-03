@@ -1,6 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
-from sqlalchemy import func
 import json
 from . import bp
 from app.core.decorators import owner_required
@@ -8,7 +7,8 @@ from app.forms.owner import PropertyForm
 from app.forms.upload import UploadImageForm, ReorderImagesForm, EmptyForm
 from app.models.property import Property, PropertyImage, Amenity
 from app.models.approval import ApprovalRequest
-from app.core.extensions import db
+from datetime import datetime
+from app.models.approval import AuditLog
 
 # Policy import
 try:

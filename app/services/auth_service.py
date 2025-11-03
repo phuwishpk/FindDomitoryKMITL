@@ -1,7 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user
 from app.models.user import Owner, Admin
-from app.core.extensions import db
 from app.repositories.interfaces.user_repo import IUserRepo
 # --- vvv ส่วนที่เพิ่มเข้ามา vvv ---
 from app.services.upload_service import UploadService

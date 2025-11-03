@@ -1,7 +1,6 @@
-from flask import render_template, request, redirect, url_for, flash, current_app
+from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy import func
-from datetime import datetime
 from . import bp
 from app.core.decorators import owner_required
 from app.models.property import Property

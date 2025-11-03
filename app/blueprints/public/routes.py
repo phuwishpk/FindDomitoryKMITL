@@ -1,4 +1,4 @@
-from flask import render_template, request, current_app, redirect, url_for, flash, session
+from flask import render_template, request, current_app, redirect, url_for, flash
 from flask_login import current_user
 from . import bp
 from app.forms.review import ReviewForm

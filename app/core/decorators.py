@@ -3,7 +3,7 @@
 
 from functools import wraps
 from flask_login import current_user
-from flask import request, redirect, url_for
+from flask import redirect, url_for
 
 def owner_required(f):
     @wraps(f)

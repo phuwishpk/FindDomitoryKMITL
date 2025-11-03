@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, current_app, request
+from flask import render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from . import bp
 from app.core.decorators import admin_required

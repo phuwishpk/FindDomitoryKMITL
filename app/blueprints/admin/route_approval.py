@@ -6,6 +6,8 @@ from app.models.property import Property
 from app.models.user import Owner
 from app.forms.upload import EmptyForm
 from app.forms.admin import RejectForm
+from app.core.extensions import db
+from app.models.approval import AuditLog
 
 # --- Property Approval Workflow ---
 @bp.route("/queue")
