@@ -2,7 +2,7 @@
 
 import pytest
 from app import create_app
-from app.extensions import db as _db
+from app.core.extensions import db as _db
 
 @pytest.fixture
 def app():

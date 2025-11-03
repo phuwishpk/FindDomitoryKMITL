@@ -37,7 +37,7 @@
                     </p>
                     <p><strong>วันที่สมัคร:</strong> {{ owner.created_at|to_bkk_time }}</p>
                     {% if owner.occupancy_notice_pdf %}
-                    <p><strong>เอกสารแนบ:</strong> <a href="/{{ owner.occupancy_notice_pdf }}" target="_blank" class="btn btn-sm btn-outline-primary">ดูเอกสาร</a></p>
+                    <p><strong>เอกสารแนบ:</strong> <a href="{{ owner.occupancy_notice_pdf }}" target="_blank" class="btn btn-sm btn-outline-primary">ดูเอกสาร</a></p>
                     {% else %}
                     <p><strong>เอกสารแนบ:</strong> <span class="text-muted">ไม่มี</span></p>
                     {% endif %}
