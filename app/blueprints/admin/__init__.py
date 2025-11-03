@@ -14,4 +14,4 @@ def index():
     return redirect(url_for("admin.dashboard"))
 
 # 3. Import routes ของ admin ทั้งหมด
-from . import route_dashboard, route_approval, route_owners, route_properties, route_master, route_reviews
+from . import route_dashboard, route_approval, route_owners, route_properties, route_master, route_reviews # noqa: E402, F401
