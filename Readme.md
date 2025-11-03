@@ -163,7 +163,7 @@ FindDormitoryKMITL/
 ### 📦 ขั้นตอนการติดตั้ง
 
 ```bash
-#  1. (เพิ่ม venv) สร้างและ Activate Virtual Environment (แนะนำให้ทำก่อนติดตั้ง dependencies)
+# 1. (เพิ่ม venv) สร้างและ Activate Virtual Environment (แนะนำให้ทำก่อนติดตั้ง dependencies)
 python3.11 -m venv venv
 source venv/Scripts/activate
 
