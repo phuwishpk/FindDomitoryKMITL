@@ -5,7 +5,7 @@ from . import bp
 from app.core.decorators import owner_required
 from app.forms.upload import UploadImageForm
 from app.models.property import Property, PropertyImage
-from app.extensions import db
+from app.core.extensions import db
 
 # Policy import
 try:

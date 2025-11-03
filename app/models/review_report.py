@@ -1,5 +1,5 @@
 # app/models/review_report.py
-from app.extensions import db
+from app.core.extensions import db
 from datetime import datetime
 
 class ReviewReport(db.Model):

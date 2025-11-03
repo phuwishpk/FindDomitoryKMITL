@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, current_app, reques
 from flask_login import login_required, current_user
 from . import bp
 from app.core.decorators import admin_required
-from app.extensions import db
+from app.core.extensions import db
 from app.models.property import Property
 from app.models.user import Owner
 from app.models.approval import AuditLog

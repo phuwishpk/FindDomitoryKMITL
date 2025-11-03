@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.extensions import db
+from app.core.extensions import db
 from flask import current_app
 from itsdangerous import URLSafeTimedSerializer as Serializer
 

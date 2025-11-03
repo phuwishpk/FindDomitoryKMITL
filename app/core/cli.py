@@ -5,7 +5,7 @@ from flask import Flask
 from app.models.property import Amenity
 from app.models.user import Owner, Admin
 from app.models.property import Property
-from app.extensions import db
+from app.core.extensions import db
 from werkzeug.security import generate_password_hash
 
 def register_commands(app: Flask):

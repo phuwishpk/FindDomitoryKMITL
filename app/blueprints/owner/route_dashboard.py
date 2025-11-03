@@ -6,7 +6,7 @@ from . import bp
 from app.core.decorators import owner_required
 from app.models.property import Property
 from app.models.approval import ApprovalRequest, AuditLog
-from app.extensions import db
+from app.core.extensions import db
 from app.forms.upload import EmptyForm
 
 @bp.get("/dashboard")

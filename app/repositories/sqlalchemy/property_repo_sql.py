@@ -1,6 +1,6 @@
 from sqlalchemy import func, not_
 from app.models.property import Property, Amenity, PropertyAmenity
-from app.extensions import db
+from app.core.extensions import db
 from datetime import datetime
 
 class SqlPropertyRepo:

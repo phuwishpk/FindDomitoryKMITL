@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.extensions import db
+from app.core.extensions import db
 
 class PropertyAmenity(db.Model):
     __tablename__ = "property_amenities"

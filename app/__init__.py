@@ -3,7 +3,7 @@
 from flask import Flask, send_from_directory, jsonify
 
 # 1. Import จาก app/core/
-from .core.config import Config
+from .config import Config
 from .core import extensions, dependencies, context_processors, cli
 from .utils.helpers import format_as_bangkok_time, from_json_string
 

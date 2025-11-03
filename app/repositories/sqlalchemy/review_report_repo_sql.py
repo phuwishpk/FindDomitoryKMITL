@@ -2,7 +2,7 @@
 
 from app.models.review_report import ReviewReport
 from app.models.review import Review
-from app.extensions import db
+from app.core.extensions import db
 from sqlalchemy.orm import joinedload
 
 class SqlReviewReportRepo:

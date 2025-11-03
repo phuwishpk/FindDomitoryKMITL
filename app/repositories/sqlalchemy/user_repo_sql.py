@@ -1,4 +1,4 @@
-from app.extensions import db
+from app.core.extensions import db
 from app.models.user import Owner, Admin
 from sqlalchemy import or_, func
 from datetime import datetime
