@@ -5,7 +5,7 @@ from app.forms.auth import OwnerRegisterForm, CombinedLoginForm, ForgotPasswordF
 from app.forms.upload import EmptyForm
 from app.models.user import Owner, Admin
 from werkzeug.security import generate_password_hash
-from app.extensions import db
+from app.core.extensions import db
 
 import smtplib
 from email.mime.text import MIMEText

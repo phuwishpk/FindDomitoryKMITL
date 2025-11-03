@@ -4,7 +4,7 @@ from datetime import datetime
 from app.models.review import Review
 from app.models.review_report import ReviewReport
 from app.models.approval import AuditLog
-from app.extensions import db
+from app.core.extensions import db
 
 class ReviewManagementService:
     def __init__(self, review_repo, report_repo, prop_repo):

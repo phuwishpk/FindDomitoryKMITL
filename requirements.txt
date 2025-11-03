@@ -10,7 +10,7 @@ Flask-Limiter==3.5.0
 # Database
 SQLAlchemy==2.0.29
 alembic==1.13.2
-greenlet==3.0.3 # Dependency for SQLAlchemy
+greenlet>=3.0.4
 
 # WSGI Server (for Production on Render)
 gunicorn==22.0.0
@@ -39,7 +39,7 @@ MarkupSafe==2.1.5
 # Environment Variables
 python-dotenv==1.0.1
 
-psycopg2-binary==2.9.9
+psycopg2-binary
 
 # --- vvv เพิ่มบรรทัดนี้ vvv ---
 cloudinary==1.40.0

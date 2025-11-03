@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from app.extensions import db
+from app.core.extensions import db
 
 class ApprovalRequest(db.Model):
     __tablename__ = "approval_requests"

@@ -1,3 +1,17 @@
-from flask import Blueprint
-bp = Blueprint("admin", __name__)
-from . import routes  # noqa: E402,F401
+# app/blueprints/admin/__init__.py
+from flask import Blueprint, redirect, url_for
+from flask_login import login_required
+from app.core.decorators import admin_required
+
+# 1. สร้าง Blueprint
+bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+# 2. สร้าง route พื้นฐาน (ถ้ามี)
+@bp.route("/")
+@login_required
+@admin_required
+def index():
+    return redirect(url_for("admin.dashboard"))
+
+# 3. Import routes ของ admin ทั้งหมด
+from . import route_dashboard, route_approval, route_owners, route_properties, route_master, route_reviews # noqa: E402, F401

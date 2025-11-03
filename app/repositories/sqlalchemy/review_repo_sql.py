@@ -1,6 +1,6 @@
 # app/repositories/sqlalchemy/review_repo_sql.py
 from app.models.review import Review
-from app.extensions import db
+from app.core.extensions import db
 
 class SqlReviewRepo:
     def add(self, review: Review) -> Review:

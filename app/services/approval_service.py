@@ -1,7 +1,7 @@
 from app.models.approval import ApprovalRequest, AuditLog
 from app.repositories.interfaces.approval_repo import IApprovalRepo
 from app.repositories.interfaces.property_repo import IPropertyRepo
-from app.extensions import db
+from app.core.extensions import db
 
 class ApprovalService:
     def __init__(self, approval_repo: IApprovalRepo, property_repo: IPropertyRepo):

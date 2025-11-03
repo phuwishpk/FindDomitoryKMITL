@@ -1,6 +1,6 @@
 from app.models.property import Property
 from app.models.approval import ApprovalRequest, AuditLog
-from app.extensions import db
+from app.core.extensions import db
 from sqlalchemy import or_
 
 class SqlApprovalRepo:
