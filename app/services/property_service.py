@@ -1,5 +1,11 @@
+# app/services/property_service.py
+
 from app.models.property import Property, Amenity
 from .location_service import LocationDataHandler
+# --- vvv [แก้ไข] ย้าย import มาไว้บนสุด vvv ---
+from app.models.approval import AuditLog
+from app.core.extensions import db
+# --- ^^^ [สิ้นสุดการแก้ไข] ^^^ ---
 
 class PropertyService:
     def __init__(self, repo):
@@ -10,22 +16,29 @@ class PropertyService:
         """
         ฟังก์ชัน Helper เพื่อจัดการข้อมูลก่อนบันทึก
         """
-        # --- vvv ส่วนที่แก้ไข vvv ---
-        # เปลี่ยนจากการตรวจสอบ "อื่นๆ" เป็น "other"
         if data.get('room_type') == 'other':
             other_type = data.get('other_room_type', '').strip()
             if other_type:
                 data['room_type'] = other_type
-        # --- ^^^ สิ้นสุดการแก้ไข ^^^ ---
         data.pop('other_room_type', None)
 
         location_json_str = data.pop('location_pin_json', None)
         data['location_pin'] = self.location_handler.parse_geojson_string(location_json_str)
 
-        if data.get('line_id', '').strip() == '-':
+        # --- vvv [START แก้ไขส่วนนี้] vvv ---
+        # แก้ไข: ตรวจสอบ None ก่อนเรียก .strip()
+        line_id_val = data.get('line_id')
+        if not line_id_val or line_id_val.strip() == '-':
             data['line_id'] = None
-        if data.get('facebook_url', '').strip() == '-':
+        else:
+            data['line_id'] = line_id_val.strip()
+
+        fb_url_val = data.get('facebook_url')
+        if not fb_url_val or fb_url_val.strip() == '-':
             data['facebook_url'] = None
+        else:
+            data['facebook_url'] = fb_url_val.strip()
+        # --- ^^^ [END แก้ไขส่วนนี้] ^^^ ---
 
         return data
 
@@ -42,11 +55,7 @@ class PropertyService:
         return self.repo.add(prop)
 
     def update(self, owner_id: int, prop_id: int, data: dict):
-        # --- vvv START: แก้ไขปัญหา Circular Import โดยย้าย import เข้ามาในฟังก์ชัน vvv ---
-        from app.models.approval import AuditLog
-        # --- [แก้ไข] เปลี่ยนจาก app.extensions เป็น app.core.extensions ---
-        from app.core.extensions import db
-        # --- ^^^ END: สิ้นสุดการแก้ไข ^^^ ---
+        # (ย้าย import ไปไว้บนสุดแล้ว)
 
         prop = self.repo.get(prop_id)
         if not prop or prop.owner_id != owner_id:
