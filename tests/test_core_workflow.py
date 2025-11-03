@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from app.core.extensions import db
 from app.models.user import Owner, Admin
 from app.models.property import Property
+import io  # <-- [เพิ่ม] Import io สำหรับสร้างไฟล์ปลอม
 
 # --- Fixtures (ตัวช่วย) ---
 
@@ -119,12 +120,14 @@ def test_full_approval_workflow(client, admin_client):
         'password': 'password123'
     }, follow_redirects=True)
     
-    # --- vvv [แก้ไขบรรทัดนี้] vvv ---
-    # ตรวจสอบข้อความ "ภาพรวมหอพัก" ที่อยู่ในหน้า dashboard
     assert "ภาพรวมหอพัก".encode('utf-8') in login_response.data
-    # --- ^^^ [สิ้นสุดการแก้ไข] ^^^ ---
     
-    # Owner สร้างหอพัก
+    # --- vvv [START แก้ไขส่วนนี้] vvv ---
+    
+    # สร้างไฟล์รูปภาพปลอมในหน่วยความจำ
+    dummy_image = (io.BytesIO(b"this-is-a-dummy-image-data"), "test.jpg")
+
+    # Owner สร้างหอพัก (เพิ่ม 'images' และ 'content_type' เข้าไป)
     create_response = client.post('/owner/property/new', data={
         'dorm_name': 'หอพักของฉัน',
         'road': 'ลาดกระบัง',
@@ -136,12 +139,15 @@ def test_full_approval_workflow(client, admin_client):
         'electric_rate': 8,
         'deposit_amount': 10000,
         'location_pin_json': '{"type": "Point", "coordinates": [100.77, 13.72]}',
-        'amenities': 'wifi' # (ต้องมีอย่างน้อย 1)
-    }, follow_redirects=True)
+        'amenities': 'wifi',
+        'images': dummy_image  # <-- เพิ่มไฟล์ปลอม
+    }, follow_redirects=True, content_type='multipart/form-data') # <-- ระบุ content_type
+    
+    # --- ^^^ [END แก้ไขส่วนนี้] ^^^ ---
     
     assert create_response.status_code == 200
     new_prop = Property.query.filter_by(dorm_name='หอพักของฉัน').first()
-    assert new_prop is not None
+    assert new_prop is not None  # <-- บรรทัดนี้ควรจะผ่านแล้ว
     assert new_prop.workflow_status == 'draft'
 
     # 4. Owner ส่งหอพักให้อนุมัติ
